@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!--
+ * editor.html
+ *
+ * This file is part of mozeditor (Editor (ACE) embedded in browser)
+ * Copyright (C) 2012  Alexey Gladkov <gladkov.alexey@gmail.com>
+ *
+ * This file is covered by the GNU General Public License,
+ * which should be included with mozeditor as the file COPYING.
+-->
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+	<meta http-equiv="PRAGMAL" content="NO-CACHE">
+
+	<title>Editor</title>
+
+	<link type="text/css" rel="stylesheet" href="jquery-ui-1.9.2.custom.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="editor.css" media="screen" />
+
+	<script src="jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery-ui-1.9.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
+
+	<script src="src/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="src/keybinding-emacs.js" type="text/javascript" charset="utf-8"></script>
+	<script src="src/keybinding-vim.js" type="text/javascript" charset="utf-8"></script>
+
+	<script src="editor-guess-mode.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body onload="main()">
+
+<div class="hidden">
+	<textarea id="filedata" class="hidden"></textarea>
+
+	<div id="dialog-restore-file" title="Restore file">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
+			Do you want to restore "<label id="dialog-restore-filename"></label>" ?
+		</p>
+	</div>
+	<div id="dialog-save-file" title="Save file">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
+			Do you really want to save "<label id="dialog-save-filename"></label>" ?
+		</p>
+	</div>
+	<div id="dialog-new-file" title="Save file">
+		<form>
+			<label for="name">Filename:</label>
+			<input type="text" name="name" id="dialog-new-filename" class="text ui-widget-content ui-corner-all" />
+		</form>
+	</div>
+</div>
+
+<div id="controlbar" class="controlbar"></div>
+
+<div id="statusbar" class="statusbar ui-widget ui-widget-header">
+	File:
+	    <label id="statusbar-filename" class="statusbar-value ui-widget-content ui-corner-all"></label>
+	Status:
+	    <label id="statusbar-changed" class="statusbar-value ui-widget-content ui-corner-all"></label>
+	Mode:
+	    <label id="statusbar-mode" class="statusbar-value ui-widget-content ui-corner-all"></label>
+</div>
+
+<div id="settings" class="settings hidden">
+	<table class="settings-table">
+		<tr>
+			<td class="settings-table-td" align="right">
+				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
+					<tr><td><button name="open" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Open...</button></td></tr>
+					<tr><td><button name="save" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save</button></td></tr>
+					<tr><td><button name="save-as" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save as...</button></td></tr>
+					<tr><td><button name="close" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Close</button></td></tr>
+				</table>
+			</td>
+			<td class="settings-table-td" align="left" rowspan="2">
+				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
+					<tr>
+						<th>Setting</th>
+						<th>Value</th>
+					</tr>
+					<tr>
+						<td class="settings-name">Show Invisibles</td>
+						<td><input id="showhidden" name="showhidden" type="checkbox" onclick="change_settings(this)"></td>
+					</tr>
+					<tr>
+						<td class="settings-name">Show Gutter</td>
+						<td><input id="showgutter" name="showgutter" type="checkbox" onclick="change_settings(this)"></td>
+					</tr>
+					<tr>
+						<td class="settings-name">Show Print Margin</td>
+						<td><input id="showmargin" name="showmargin" type="checkbox" onclick="change_settings(this)"></td>
+					</tr>
+					<tr>
+						<td class="settings-name">Font size</td>
+						<td>
+							<select id="fontsize" name="fontsize" onchange="change_settings(this)">
+								<option value="10px">10px</option>
+								<option value="11px">11px</option>
+								<option value="12px">12px</option>
+								<option value="14px">14px</option>
+								<option value="16px">16px</option>
+								<option value="20px">20px</option>
+								<option value="24px">24px</option>
+								<option value="26px">26px</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="settings-name">Soft Wrap</td>
+						<td>
+							<select id="softwrap" name="softwrap" onchange="change_settings(this)">
+								<option value="off">Off</option>
+								<option value="40">40 Chars</option>
+								<option value="80">80 Chars</option>
+								<option value="free">Free</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="settings-name">Code Folding</td>
+						<td>
+							<select id="folding" name="folding" onchange="change_settings(this)">
+								<option value="manual">manual</option>
+								<option value="markbegin">mark begin</option>
+								<option value="markbeginend">mark begin and end</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="settings-name">Keybindings</td>
+						<td>
+							<select id="keybinding" name="keybinding" onchange="change_settings(this)">
+								<option value="ace"><a>Ace</option>
+								<option value="vim"><a>Vim</option>
+								<option value="emacs"><a>Emacs</option>
+								<option value="custom"><a>Custom</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="settings-name">Syntax Highlight</td>
+						<td>
+							<select id="highlight" name="highlight" onchange="change_settings(this)">
+								<option value="abap">abap</option>
+								<option value="asciidoc">asciidoc</option>
+								<option value="c9search">c9search</option>
+								<option value="c_cpp">c/c++</option>
+								<option value="clojure">clojure</option>
+								<option value="coffee">coffee</option>
+								<option value="coldfusion">coldfusion</option>
+								<option value="csharp">csharp</option>
+								<option value="css">css</option>
+								<option value="dart">dart</option>
+								<option value="diff">diff</option>
+								<option value="glsl">glsl</option>
+								<option value="golang">golang</option>
+								<option value="groovy">groovy</option>
+								<option value="haml">haml</option>
+								<option value="haxe">haxe</option>
+								<option value="html">html</option>
+								<option value="jade">jade</option>
+								<option value="java">java</option>
+								<option value="javascript">javascript</option>
+								<option value="json">json</option>
+								<option value="jsp">jsp</option>
+								<option value="jsx">jsx</option>
+								<option value="latex">latex</option>
+								<option value="less">less</option>
+								<option value="liquid">liquid</option>
+								<option value="lisp">lisp</option>
+								<option value="lua">lua</option>
+								<option value="luapage">luapage</option>
+								<option value="lucene">lucene</option>
+								<option value="makefile">makefile</option>
+								<option value="markdown">markdown</option>
+								<option value="objectivec">objectivec</option>
+								<option value="ocaml">ocaml</option>
+								<option value="perl">perl</option>
+								<option value="pgsql">pgsql</option>
+								<option value="php">php</option>
+								<option value="powershell">powershell</option>
+								<option value="python">python</option>
+								<option value="rdoc">rdoc</option>
+								<option value="rhtml">rhtml</option>
+								<option value="r">r</option>
+								<option value="ruby">ruby</option>
+								<option value="scad">scad</option>
+								<option value="scala">scala</option>
+								<option value="scss">scss</option>
+								<option value="sh">sh</option>
+								<option value="sql">sql</option>
+								<option value="stylus">stylus</option>
+								<option value="svg">svg</option>
+								<option value="tcl">tcl</option>
+								<option value="tex">tex</option>
+								<option value="textile">textile</option>
+								<option value="text">text</option>
+								<option value="typescript">typescript</option>
+								<option value="xml">xml</option>
+								<option value="xquery">xquery</option>
+								<option value="yaml">yaml</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="settings-name">Theme</td>
+						<td>
+							<select id="theme" name="theme" onchange="change_settings(this)">
+								<option value="ambiance">ambiance</option>
+								<option value="chrome">chrome</option>
+								<option value="clouds">clouds</option>
+								<option value="clouds_midnight">clouds_midnight</option>
+								<option value="cobalt">cobalt</option>
+								<option value="crimson_editor">crimson_editor</option>
+								<option value="dawn">dawn</option>
+								<option value="dreamweaver">dreamweaver</option>
+								<option value="eclipse">eclipse</option>
+								<option value="github">github</option>
+								<option value="idle_fingers">idle_fingers</option>
+								<option value="kr">kr</option>
+								<option value="merbivore">merbivore</option>
+								<option value="merbivore_soft">merbivore_soft</option>
+								<option value="mono_industrial">mono_industrial</option>
+								<option value="monokai">monokai</option>
+								<option value="pastel_on_dark">pastel_on_dark</option>
+								<option value="solarized_dark">solarized_dark</option>
+								<option value="solarized_light">solarized_light</option>
+								<option value="textmate">textmate</option>
+								<option value="tomorrow">tomorrow</option>
+								<option value="tomorrow_night_blue">tomorrow_night_blue</option>
+								<option value="tomorrow_night_bright">tomorrow_night_bright</option>
+								<option value="tomorrow_night_eighties">tomorrow_night_eighties</option>
+								<option value="tomorrow_night">tomorrow_night</option>
+								<option value="twilight">twilight</option>
+								<option value="vibrant_ink">vibrant_ink</option>
+								<option value="xcode">xcode</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="settings-table-td" align="right">
+				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
+					<tr><td><button name="undo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Undo</button></td></tr>
+					<tr><td><button name="redo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Redo</button></td></tr>
+					<tr><td><button name="uppercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">UpperCase</button></td></tr>
+					<tr><td><button name="lowercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">LowerCase</button></td></tr>
+					<tr><td><button name="goto" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Goto...</button></td></tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<pre id="editor"></pre>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+/* editor.css
+ *
+ * This file is part of mozeditor (Editor (ACE) embedded in browser)
+ * Copyright (C) 2012  Alexey Gladkov <gladkov.alexey@gmail.com>
+ *
+ * This file is covered by the GNU General Public License,
+ * which should be included with mozeditor as the file COPYING.
+ */
+
+html  {
+	background-color: #455463;
+}
+
+.ace_editor {
+	height: auto;
+	width: auto;
+	border: 0;
+	margin: 0;
+	position: fixed !important;
+	top: 32px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 10;
+	background: white;
+}
+
+.ace_editor.fullScreen {
+	height: auto;
+	width: auto;
+	border: 0;
+	margin: 0;
+	position: fixed !important;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 10;
+	background: white;
+	overflow: hidden
+}
+
+.hidden {
+	display: none;
+	visibility: hidden;
+}
+
+.statusbar {
+	position: fixed !important;
+	top: 0;
+	left: 0;
+	right: 0;
+
+	height: 20px;
+
+	font-size: 1em;
+	padding: 5px 10px 5px 10px;*/
+}
+
+.statusbar-value {
+	padding: 3px 5px 3px 5px;
+}
+
+.controlbar {
+	border:2px solid #a1a1a1;
+	border-radius: 50px;
+
+	padding:10px; 
+	background: #dddddd;
+	opacity: 0.4;
+	z-index: 100;
+
+	width: 80px;
+	height: 80px;
+	
+	position: fixed !important;
+	top: -40px;
+	right: -40px;
+}
+
+.settings {
+	background: rgba(0, 0, 0, 0.6);
+	height:   auto;
+	width:    auto;
+        top:      0;
+        left:     0;
+        right:    0;
+        bottom:   0;
+        position: fixed !important;
+        z-index:  20;
+        color:    white;
+        overflow: auto;
+        fontSize: 14px;
+
+	padding: 5% 10% 5% 10%;
+}
+
+.settings-menu {
+	padding: 10px;
+	height: 100%;
+}
+
+.settings-table {
+	width: 100%;
+	height: 100%;
+}
+
+/*
+.settings-table td {
+	border: 1px solid gray;
+}
+
+.settings-table-td {
+	width: 50%;
+}*/
+
+.settings button {
+	width: 150px;
+}
+
+.ui-widget-overlay {
+	background: rgba(0, 0, 0, 0.6);
+}
