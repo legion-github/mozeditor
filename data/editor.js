@@ -59,7 +59,7 @@ var settings = {
 	_update_checkbox: function (id, arg) {
 		(arg)
 			? $(id).attr('checked', 'checked')
-			: $('#showhidden').removeAttr('checked');
+			: $(id).removeAttr('checked');
 	},
 	showInvisibles: function (arg) {
 		if (arg === undefined)
@@ -419,7 +419,7 @@ function dialog_restore_file(filename, mimetype)
 
 function change_settings(obj)
 {
-	switch (obj.name) {
+	switch (obj.id) {
 		case 'open':
 			send_event('send-open', {
 				type: 'filename',

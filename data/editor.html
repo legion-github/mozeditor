@@ -78,34 +78,30 @@
 		<tr>
 			<td class="settings-table-td" align="right">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
-					<tr><td><button name="open" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Open...</button></td></tr>
-					<tr><td><button name="save" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save</button></td></tr>
-					<tr><td><button name="save-as" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save as...</button></td></tr>
-					<tr><td><button name="close" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Close</button></td></tr>
+					<tr><td><button id="open" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Open...</button></td></tr>
+					<tr><td><button id="save" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save</button></td></tr>
+					<tr><td><button id="save-as" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save as...</button></td></tr>
+					<tr><td><button id="close" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Close</button></td></tr>
 				</table>
 			</td>
 			<td class="settings-table-td" align="left" rowspan="2">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
 					<tr>
-						<th>Setting</th>
-						<th>Value</th>
-					</tr>
-					<tr>
 						<td class="settings-name">Show Invisibles</td>
-						<td><input id="showhidden" name="showhidden" type="checkbox" onclick="change_settings(this)"></td>
+						<td><input id="showhidden" type="checkbox" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">Show Gutter</td>
-						<td><input id="showgutter" name="showgutter" type="checkbox" onclick="change_settings(this)"></td>
+						<td><input id="showgutter" type="checkbox" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">Show Print Margin</td>
-						<td><input id="showmargin" name="showmargin" type="checkbox" onclick="change_settings(this)"></td>
+						<td><input id="showmargin" type="checkbox" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">Font size</td>
 						<td>
-							<select id="fontsize" name="fontsize" onchange="change_settings(this)">
+							<select id="fontsize" onchange="change_settings(this)">
 								<option value="10px">10px</option>
 								<option value="11px">11px</option>
 								<option value="12px">12px</option>
@@ -120,7 +116,7 @@
 					<tr>
 						<td class="settings-name">Soft Wrap</td>
 						<td>
-							<select id="softwrap" name="softwrap" onchange="change_settings(this)">
+							<select id="softwrap" onchange="change_settings(this)">
 								<option value="off">Off</option>
 								<option value="40">40 Chars</option>
 								<option value="80">80 Chars</option>
@@ -130,16 +126,16 @@
 					</tr>
 					<tr>
 						<td class="settings-name">Use of soft tabs</td>
-						<td><input id="softtab" name="softtab" type="checkbox" onclick="change_settings(this)"></td>
+						<td><input id="softtab" type="checkbox" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">Tab size</td>
-						<td><input id="tabsize" name="tabsize" type="text" size="3" onclick="change_settings(this)"></td>
+						<td><input id="tabsize" type="text" size="3" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">Code Folding</td>
 						<td>
-							<select id="folding" name="folding" onchange="change_settings(this)">
+							<select id="folding" onchange="change_settings(this)">
 								<option value="manual">manual</option>
 								<option value="markbegin">mark begin</option>
 								<option value="markbeginend">mark begin and end</option>
@@ -149,7 +145,7 @@
 					<tr>
 						<td class="settings-name">Keybindings</td>
 						<td>
-							<select id="keybinding" name="keybinding" onchange="change_settings(this)">
+							<select id="keybinding" onchange="change_settings(this)">
 								<option value="ace"><a>Ace</option>
 								<option value="vim"><a>Vim</option>
 								<option value="emacs"><a>Emacs</option>
@@ -160,7 +156,7 @@
 					<tr>
 						<td class="settings-name">Syntax Highlight</td>
 						<td>
-							<select id="highlight" name="highlight" onchange="change_settings(this)">
+							<select id="highlight" onchange="change_settings(this)">
 								<option value="abap">abap</option>
 								<option value="asciidoc">asciidoc</option>
 								<option value="c9search">c9search</option>
@@ -225,7 +221,7 @@
 					<tr>
 						<td class="settings-name">Theme</td>
 						<td>
-							<select id="theme" name="theme" onchange="change_settings(this)">
+							<select id="theme" onchange="change_settings(this)">
 								<option value="ambiance">ambiance</option>
 								<option value="chrome">chrome</option>
 								<option value="clouds">clouds</option>
@@ -263,11 +259,11 @@
 		<tr>
 			<td class="settings-table-td" align="right">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
-					<tr><td><button name="undo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Undo</button></td></tr>
-					<tr><td><button name="redo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Redo</button></td></tr>
-					<tr><td><button name="uppercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">UpperCase</button></td></tr>
-					<tr><td><button name="lowercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">LowerCase</button></td></tr>
-					<tr><td><button name="goto" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Goto...</button></td></tr>
+					<tr><td><button id="undo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Undo</button></td></tr>
+					<tr><td><button id="redo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Redo</button></td></tr>
+					<tr><td><button id="uppercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">UpperCase</button></td></tr>
+					<tr><td><button id="lowercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">LowerCase</button></td></tr>
+					<tr><td><button id="goto" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Goto...</button></td></tr>
 				</table>
 			</td>
 		</tr>
