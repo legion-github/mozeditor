@@ -201,11 +201,11 @@ var autosave = {
 };
 
 var storage = {
-	has: function (filename) {
+	has: function (key) {
 		var items = localStorage.length;
 
 		for (var i = 0; i < items; i++) {
-			if (localStorage.key(i) == filename)
+			if (localStorage.key(i) == key)
 				return true;
 		}
 		return false;
@@ -214,6 +214,7 @@ var storage = {
 		try {
 			localStorage.setItem(filename, JSON.stringify({
 				name: filename,
+				mime: $('#filedata').attr('mime'),
 				data: editor.getValue()
 			}));
 
@@ -227,9 +228,18 @@ var storage = {
 				var file = JSON.parse(localStorage.getItem(filename));
 
 				editor.setValue(file.data);
-				editor.gotoLine(1);
+				editor.gotoLine(0,0,false);
+				editor.moveCursorTo(0,0);
 
-				$('#filedata').attr('name', filename);
+				var mode = guessMode.check(file.mime);
+				settings.mode(mode);
+
+				// Update statusbar
+				statusbar.filename(file.name);
+				statusbar.mode(mode);
+
+				$('#filedata').attr('name', file.name);
+				$('#filedata').attr('mime', file.mime);
 
 				autosave.start();
 				changed = true;
@@ -240,9 +250,35 @@ var storage = {
 		}
 		return false;
 	},
-	remove: function (filename) {
+	remove: function (key) {
 		try {
-			localStorage.removeItem(filename);
+			localStorage.removeItem(key);
+		} catch (e) {
+			alert("Storage error: " + e);
+		}
+	},
+	get: function (key) {
+		try {
+			return (this.has(key))
+				? JSON.parse(localStorage.getItem(key))
+				: {};
+		} catch (e) {
+			alert("Storage error: " + e);
+		}
+		return {};
+	},
+	append: function (key, value, maxlen) {
+		try {
+			var list = (this.has(key))
+				? JSON.parse(localStorage.getItem(key))
+				: [];
+			if (maxlen != undefined) {
+				if (list.length == maxlen)
+					list.pop();
+			}
+			list.unshift(value);
+			localStorage.setItem(key, JSON.stringify(list));
+			return list;
 		} catch (e) {
 			alert("Storage error: " + e);
 		}
@@ -257,6 +293,16 @@ function send_event(name, arg)
 	$('#filedata').get(0).dispatchEvent(event);
 }
 
+function ISODateString(d){
+	function pad(n) { return (n < 10) ? '0' + n : n }
+	return d.getFullYear()+'-'
+		+ pad(d.getMonth()+1)+'-'
+		+ pad(d.getDate())+' '
+		+ pad(d.getHours())+':'
+		+ pad(d.getMinutes())+':'
+		+ pad(d.getSeconds());
+}
+
 function save_file()
 {
 	try {
@@ -265,6 +311,19 @@ function save_file()
 		autosave.stop();
 		changed = false;
 	} catch(e) { /* Ignore all */ }
+}
+
+function open_file(name, mime)
+{
+	if (storage.has(name)) {
+		dialog_restore_file(name, mime);
+		return;
+	}
+	send_event('send-open', {
+		type: 'filedata',
+		mime: mime,
+		name: name
+	});
 }
 
 function dialog_new_file()
@@ -315,7 +374,7 @@ function dialog_save_file()
 	});
 }
 
-function dialog_restore_file(filename)
+function dialog_restore_file(filename, mimetype)
 {
 	$('#dialog-restore-filename').text(filename);
 	$("#dialog-restore-file").dialog({
@@ -334,7 +393,7 @@ function dialog_restore_file(filename)
 				storage.remove(filename);
 				send_event('send-open', {
 					type: 'filedata',
-					mime: '',
+					mime: mimetype,
 					name: filename
 				});
 				$(this).dialog("close");
@@ -421,17 +480,16 @@ function change_settings(obj)
 	}
 }
 
-function handleOpenFile (evt) {
+function reopen(doc)
+{
+	var elem = $(doc);
+	open_file(elem.text(), elem.attr('mime'));
+}
+
+function handleOpenFile(evt)
+{
 	if (evt.detail.type == 'filename') {
-		if (storage.has(evt.detail.name)) {
-			dialog_restore_file(evt.detail.name);
-			return;
-		}
-		send_event('send-open', {
-			type: 'filedata',
-			mime: evt.detail.mime,
-			name: evt.detail.name
-		});
+		open_file(evt.detail.name, evt.detail.mime);
 		return;
 	}
 
@@ -453,10 +511,50 @@ function handleOpenFile (evt) {
 	// Update statusbar
 	statusbar.filename($('#filedata').attr('name'));
 	statusbar.mode(newmode);
+try {
+	// Update history
+	var recently_opened = storage.get('recently-opened');
+	var found = false;
+
+	for (var i = 0; i < recently_opened.length; i++) {
+		if (recently_opened[i].name == $('#filedata').attr('name')) {
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		var d = new Date();
+		var list = storage.append('recently-opened', {
+			name: $('#filedata').attr('name'),
+			mime: $('#filedata').attr('mime'),
+			date: ISODateString(d)
+		}, 10);
+
+		$('#recently-opened').empty();
+		$.each(list, function (i,v) {
+			$('#recently-opened').append(
+				'<tr>'+
+				'<td><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
+				'<td>' + v.date + '</td>'+
+				'</tr>');
+		});
+	}
+} catch(e) { alert(e); }
 }
 
 function main()
 {
+	$("#tabs").tabs({ heightStyle: "fill" });
+
+	$.each(storage.get('recently-opened'), function (i,v) {
+		$('#recently-opened').append(
+			'<tr>'+
+			'<td><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
+			'<td>' + v.date + '</td>'+
+			'</tr>');
+	});
+
 	/*
 	 * Create editor
 	 */

@@ -67,6 +67,13 @@
 </div>
 
 <div id="settings" class="settings hidden">
+    <div id="tabs">
+	<ul>
+		<li><a href="#tab1">General</a></li>
+		<li><a href="#tab2">Recently opened</a></li>
+	</ul>
+
+	<div id="tab1" class="settings-tab">
 	<table class="settings-table">
 		<tr>
 			<td class="settings-table-td" align="right">
@@ -257,6 +264,13 @@
 			</td>
 		</tr>
 	</table>
+	</div>
+
+	<div id="tab2">
+		<table id="recently-opened" class="ui-widget ui-widget-content">
+		</table>
+	</div>
+    </div>
 </div>
 
 <pre id="editor"></pre>
