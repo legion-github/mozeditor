@@ -62,55 +62,55 @@ var settings = {
 			: $('#showhidden').removeAttr('checked');
 	},
 	showInvisibles: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._showInvisibles;
-		this._showInvisibles = (arg == true);
+		this._showInvisibles = (arg === true);
 		this._editor.setShowInvisibles(this._showInvisibles);
 		this._update_checkbox('#showhidden', this._showInvisibles);
 	},
 	showGutter: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._showGutter;
-		this._showGutter = (arg == true);
+		this._showGutter = (arg === true);
 		this._editor.renderer.setShowGutter(this._showGutter);
 		this._update_checkbox('#showgutter', this._showGutter);
 	},
 	showPrintMargin: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._showPrintMargin;
-		this._showPrintMargin = (arg == true);
+		this._showPrintMargin = (arg === true);
 		this._editor.renderer.setShowPrintMargin(this._showPrintMargin);
 		this._update_checkbox('#showmargin', this._showPrintMargin);
 	},
 	mode: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._mode;
 		this._editor.session.setMode('ace/mode/' + arg);
 		this._update_select('#highlight', arg);
 		this._mode = arg;
 	},
 	keybinding: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._keybinding;
 		this._editor.setDefaultHandler(arg);
 		this._keybinding = arg;
 	},
 	theme: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._theme;
 		this._editor.setTheme('ace/theme/' + arg);
 		this._update_select('#theme', arg);
 		this._theme = arg;
 	},
 	folding: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._folding;
 		this._editor.session.setFoldStyle(arg);
 		this._update_select('#folding', arg);
 		this._folding = arg;
 	},
 	softwrap: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._softwrap;
 		switch (arg) {
 			case "off":
@@ -132,7 +132,7 @@ var settings = {
 		this._softwrap = arg;
 	},
 	fontsize: function (arg) {
-		if (arg == undefined)
+		if (arg === undefined)
 			return this._fontsize;
 		this._editor.setFontSize(arg);
 		this._update_select('#fontsize', arg);
@@ -152,9 +152,9 @@ var statusbar = {
 		$('#statusbar-keybinding').text(this._keybinding);
 	},
 	filename: function (name) {
-		if (name == undefined)
+		if (name === undefined)
 			return this._filename;
-		if (name == '') {
+		if (name === '') {
 			this.changed(false);
 			this._filename = DEFAULT_FILENAME;
 		} else {
@@ -163,13 +163,13 @@ var statusbar = {
 		$('#statusbar-filename').text(this._filename);
 	},
 	changed: function (state) {
-		if (state == undefined)
+		if (state === undefined)
 			return this._changed;
 		this._changed = state;
 		$('#statusbar-changed').text(state ? STATUS_CHANGED : STATUS_SAVED);
 	},
 	mode: function (mode) {
-		if (mode == undefined)
+		if (mode === undefined)
 			return this._mode;
 		this._mode = mode;
 		$('#statusbar-mode').text(mode);
@@ -184,13 +184,13 @@ var autosave = {
 			if (filename)
 				storage.backup(filename);
 		}, 3000);
-		if (this._id != 0)
+		if (this._id !== 0)
 			statusbar.changed(true);
 		return true;
 	},
 	stop: function() {
 		try {
-			if (this._id != 0)
+			if (this._id !== 0)
 				clearInterval(this._id);
 		} catch(e) {
 			alert(e);
@@ -272,7 +272,7 @@ var storage = {
 			var list = (this.has(key))
 				? JSON.parse(localStorage.getItem(key))
 				: [];
-			if (maxlen != undefined) {
+			if (maxlen !== undefined) {
 				if (list.length == maxlen)
 					list.pop();
 			}
@@ -288,7 +288,7 @@ var storage = {
 function send_event(name, arg)
 {
 	var event = new CustomEvent(name, {
-		"detail": (arg != undefined) ? arg : ''
+		"detail": (arg !== undefined) ? arg : ''
 	});
 	$('#filedata').get(0).dispatchEvent(event);
 }
@@ -415,7 +415,7 @@ function change_settings(obj)
 		case 'close':
 			newfile = true;
 			editor.setValue('');
-			editor.gotoLine(1);
+			editor.gotoLine(0,0,false);
 			$('#filedata').attr('name', '');
 			statusbar.filename('');
 			newfile = false;
@@ -463,13 +463,13 @@ function change_settings(obj)
 			settings.folding(obj.value);
 			break;
 		case 'showhidden':
-			setttings.showInvisibles(obj.checked == true);
+			setttings.showInvisibles(obj.checked === true);
 			break;
 		case 'showgutter':
-			settings.showGutter(obj.checked == true);
+			settings.showGutter(obj.checked === true);
 			break;
 		case 'showmargin':
-			settings.showPrintMargin(obj.checked == true);
+			settings.showPrintMargin(obj.checked === true);
 			break;
 		case 'softwrap':
 			settings.softwrap(obj.value);
