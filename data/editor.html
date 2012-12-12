@@ -38,32 +38,31 @@
 	<div id="dialog-restore-file" title="Restore file">
 		<p>
 			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
-			Do you want to restore "<label id="dialog-restore-filename"></label>" ?
+			Do you want to restore file ?
+			<p><b><label id="dialog-restore-filename"></label></b></p>
 		</p>
 	</div>
 	<div id="dialog-save-file" title="Save file">
 		<p>
 			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
-			Do you really want to save "<label id="dialog-save-filename"></label>" ?
+			Do you really want to save file ?
+			<p><b><label id="dialog-save-filename"></label></b></p>
 		</p>
 	</div>
 	<div id="dialog-new-file" title="Save file">
-		<form>
-			<label for="name">Filename:</label>
-			<input type="text" name="name" id="dialog-new-filename" class="text ui-widget-content ui-corner-all" />
-		</form>
+		<p>
+			<label for="name">File:</label>
+			<input type="text" name="name" id="dialog-new-filename" style="width:100%" class="ui-widget-content ui-corner-all" />
+		</p>
 	</div>
 </div>
 
 <div id="controlbar" class="controlbar"></div>
 
 <div id="statusbar" class="statusbar ui-widget ui-widget-header">
-	File:
-	    <label id="statusbar-filename" class="statusbar-value ui-widget-content ui-corner-all"></label>
-	Status:
-	    <label id="statusbar-changed" class="statusbar-value ui-widget-content ui-corner-all"></label>
-	Mode:
-	    <label id="statusbar-mode" class="statusbar-value ui-widget-content ui-corner-all"></label>
+	File:   <label id="statusbar-filename" class="statusbar-value ui-widget-content ui-corner-all"></label>
+	Status: <label id="statusbar-changed" class="statusbar-value ui-widget-content ui-corner-all"></label>
+	Mode:   <label id="statusbar-mode" class="statusbar-value ui-widget-content ui-corner-all"></label>
 </div>
 
 <div id="settings" class="settings hidden">
@@ -271,8 +270,7 @@
 	</div>
 
 	<div id="tab2">
-		<table id="recently-opened" class="ui-widget ui-widget-content">
-		</table>
+		<table id="recently-opened" class="ui-widget ui-widget-content"></table>
 	</div>
     </div>
 </div>
