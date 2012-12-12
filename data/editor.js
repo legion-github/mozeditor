@@ -21,17 +21,15 @@ var settings = {
 	_folding:    'manual',
 	_softwrap:   'off',
 	_fontsize:   '14px',
+	_tabSize:    4,
 
 	_showInvisibles:  true,
 	_showPrintMargin: true,
 	_showGutter:      true,
+	_softTab:         false,
 
 	init: function (editor) {
 		this._editor = editor;
-
-		this._showInvisibles  = editor.getShowInvisibles();
-		this._showGutter      = editor.renderer.getShowGutter();
-		this._showPrintMargin = editor.renderer.getShowPrintMargin();
 
 		settings.mode(this._mode);
 		settings.keybinding(this._keybinding);
@@ -42,6 +40,8 @@ var settings = {
 		settings.showInvisibles(this._showInvisibles);
 		settings.showGutter(this._showGutter);
 		settings.showPrintMargin(this._showPrintMargin);
+		settings.softTab(this._softTab);
+		settings.tabSize(this._tabSize);
 
 		$('#controlbar').on('click', function (e) {
 			$('#settings').toggleClass('hidden');
@@ -64,21 +64,21 @@ var settings = {
 	showInvisibles: function (arg) {
 		if (arg === undefined)
 			return this._showInvisibles;
-		this._showInvisibles = (arg === true);
+		this._showInvisibles = arg;
 		this._editor.setShowInvisibles(this._showInvisibles);
 		this._update_checkbox('#showhidden', this._showInvisibles);
 	},
 	showGutter: function (arg) {
 		if (arg === undefined)
 			return this._showGutter;
-		this._showGutter = (arg === true);
+		this._showGutter = arg;
 		this._editor.renderer.setShowGutter(this._showGutter);
 		this._update_checkbox('#showgutter', this._showGutter);
 	},
 	showPrintMargin: function (arg) {
 		if (arg === undefined)
 			return this._showPrintMargin;
-		this._showPrintMargin = (arg === true);
+		this._showPrintMargin = arg;
 		this._editor.renderer.setShowPrintMargin(this._showPrintMargin);
 		this._update_checkbox('#showmargin', this._showPrintMargin);
 	},
@@ -137,6 +137,21 @@ var settings = {
 		this._editor.setFontSize(arg);
 		this._update_select('#fontsize', arg);
 		this._fontsize = arg;
+	},
+	softTab: function (arg) {
+		if (arg === undefined)
+			return this._softTab;
+		this._softTab = arg;
+		this._editor.session.setUseSoftTabs(this._softTab);
+		this._update_checkbox('#softtab', this._softTab);
+	},
+	tabSize: function (arg) {
+		if (arg === undefined)
+			return this._tabSize;
+		var n = parseInt(arg);
+		this._editor.session.setTabSize(n);
+		$('#tabsize').val(n);
+		this._tabSize = n;
 	}
 };
 
@@ -463,13 +478,13 @@ function change_settings(obj)
 			settings.folding(obj.value);
 			break;
 		case 'showhidden':
-			setttings.showInvisibles(obj.checked === true);
+			settings.showInvisibles(obj.checked);
 			break;
 		case 'showgutter':
-			settings.showGutter(obj.checked === true);
+			settings.showGutter(obj.checked);
 			break;
 		case 'showmargin':
-			settings.showPrintMargin(obj.checked === true);
+			settings.showPrintMargin(obj.checked);
 			break;
 		case 'softwrap':
 			settings.softwrap(obj.value);
@@ -477,6 +492,10 @@ function change_settings(obj)
 		case 'fontsize':
 			settings.fontsize(obj.value);
 			break;
+		case 'softtabs':
+			settings.softTab(obj.checked);
+		case 'tabsize':
+			settings.tabSize(obj.value);
 	}
 }
 
