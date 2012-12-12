@@ -86,19 +86,31 @@
 			<td class="settings-table-td" align="left" rowspan="2">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
 					<tr>
-						<td class="settings-name">Show Invisibles</td>
-						<td><input id="showhidden" type="checkbox" onclick="change_settings(this)"></td>
+						<td class="settings-name">
+							<label title="Invisible characters are being shown">Show Invisibles</label>
+						</td>
+						<td>
+							<input id="showhidden" type="checkbox" onclick="change_settings(this)">
+						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Show Gutter</td>
-						<td><input id="showgutter" type="checkbox" onclick="change_settings(this)"></td>
+						<td class="settings-name">
+							<label title="Identifies whether you want to show the gutter or not">Show Gutter</label>
+						</td>
+						<td>
+							<input id="showgutter" type="checkbox" onclick="change_settings(this)">
+						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Show Print Margin</td>
+						<td class="settings-name">
+							<label title="Identifies whether you want to show the print margin or not">Show Print Margin</label>
+						</td>
 						<td><input id="showmargin" type="checkbox" onclick="change_settings(this)"></td>
 					</tr>
 					<tr>
-						<td class="settings-name">Font size</td>
+						<td class="settings-name">
+							<label title="Set a new font size for the editor text">Font size</label>
+						</td>
 						<td>
 							<select id="fontsize" onchange="change_settings(this)">
 								<option value="10px">10px</option>
@@ -113,7 +125,9 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Soft Wrap</td>
+						<td class="settings-name">
+							<label>Soft Wrap</label>
+						</td>
 						<td>
 							<select id="softwrap" onchange="change_settings(this)">
 								<option value="off">Off</option>
@@ -124,15 +138,25 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Use of soft tabs</td>
-						<td><input id="softtab" type="checkbox" onclick="change_settings(this)"></td>
+						<td class="settings-name">
+							<label title="Soft tabs means you're using spaces instead of the tab character">Use of soft tabs</label>
+						</td>
+						<td>
+							<input id="softtab" type="checkbox" onclick="change_settings(this)">
+						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Tab size</td>
-						<td><input id="tabsize" type="text" size="3" onclick="change_settings(this)"></td>
+						<td class="settings-name">
+							<label title="Set the number of spaces that define a soft tab">Tab size</label>
+						</td>
+						<td>
+							<input id="tabsize" type="text" size="3" onclick="change_settings(this)">
+						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Code Folding</td>
+						<td class="settings-name">
+							<label>Code Folding</label>
+						</td>
 						<td>
 							<select id="folding" onchange="change_settings(this)">
 								<option value="manual">manual</option>
@@ -142,7 +166,9 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Keybindings</td>
+						<td class="settings-name">
+							<label>Keybindings</label>
+						</td>
 						<td>
 							<select id="keybinding" onchange="change_settings(this)">
 								<option value="ace"><a>Ace</option>
@@ -153,7 +179,9 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Syntax Highlight</td>
+						<td class="settings-name">
+							<label>Syntax Highlight</label>
+						</td>
 						<td>
 							<select id="highlight" onchange="change_settings(this)">
 								<option value="abap">abap</option>
@@ -218,7 +246,9 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="settings-name">Theme</td>
+						<td class="settings-name">
+							<label>Theme</label>
+						</td>
 						<td>
 							<select id="theme" onchange="change_settings(this)">
 								<option value="ambiance">ambiance</option>
