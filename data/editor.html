@@ -27,7 +27,10 @@
 	<script src="src/keybinding-emacs.js" type="text/javascript" charset="utf-8"></script>
 	<script src="src/keybinding-vim.js" type="text/javascript" charset="utf-8"></script>
 
-	<script src="editor-guess-mode.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor-guessmode.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor-storage.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor-settings.js" type="text/javascript" charset="utf-8"></script>
+	<script src="editor-statusbar.js" type="text/javascript" charset="utf-8"></script>
 	<script src="editor.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body onload="main()">
@@ -75,22 +78,22 @@
 	<div id="tab1" class="settings-tab">
 	<table class="settings-table">
 		<tr>
-			<td class="settings-table-td" align="right">
+			<td class="settings-table-td">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
-					<tr><td><button id="open" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Open...</button></td></tr>
-					<tr><td><button id="save" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save</button></td></tr>
-					<tr><td><button id="save-as" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Save as...</button></td></tr>
-					<tr><td><button id="close" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Close</button></td></tr>
+					<tr><td><button id="open"    class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Open...</button></td></tr>
+					<tr><td><button id="save"    class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Save</button></td></tr>
+					<tr><td><button id="save-as" class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Save as...</button></td></tr>
+					<tr><td><button id="close"   class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Close</button></td></tr>
 				</table>
 			</td>
-			<td class="settings-table-td" align="left" rowspan="2">
+			<td class="settings-table-td" rowspan="2">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
 					<tr>
 						<td class="settings-name">
 							<label title="Invisible characters are being shown">Show Invisibles</label>
 						</td>
 						<td>
-							<input id="showhidden" type="checkbox" onclick="change_settings(this)">
+							<input id="showhidden" type="checkbox" onclick="handle_settings(this)">
 						</td>
 					</tr>
 					<tr>
@@ -98,21 +101,21 @@
 							<label title="Identifies whether you want to show the gutter or not">Show Gutter</label>
 						</td>
 						<td>
-							<input id="showgutter" type="checkbox" onclick="change_settings(this)">
+							<input id="showgutter" type="checkbox" onclick="handle_settings(this)">
 						</td>
 					</tr>
 					<tr>
 						<td class="settings-name">
 							<label title="Identifies whether you want to show the print margin or not">Show Print Margin</label>
 						</td>
-						<td><input id="showmargin" type="checkbox" onclick="change_settings(this)"></td>
+						<td><input id="showmargin" type="checkbox" onclick="handle_settings(this)"></td>
 					</tr>
 					<tr>
 						<td class="settings-name">
 							<label title="Set a new font size for the editor text">Font size</label>
 						</td>
 						<td>
-							<select id="fontsize" onchange="change_settings(this)">
+							<select id="fontsize" onchange="handle_settings(this)">
 								<option value="10px">10px</option>
 								<option value="11px">11px</option>
 								<option value="12px">12px</option>
@@ -129,7 +132,7 @@
 							<label>Soft Wrap</label>
 						</td>
 						<td>
-							<select id="softwrap" onchange="change_settings(this)">
+							<select id="softwrap" onchange="handle_settings(this)">
 								<option value="off">Off</option>
 								<option value="40">40 Chars</option>
 								<option value="80">80 Chars</option>
@@ -142,7 +145,7 @@
 							<label title="Soft tabs means you're using spaces instead of the tab character">Use of soft tabs</label>
 						</td>
 						<td>
-							<input id="softtab" type="checkbox" onclick="change_settings(this)">
+							<input id="softtab" type="checkbox" onclick="handle_settings(this)">
 						</td>
 					</tr>
 					<tr>
@@ -150,7 +153,7 @@
 							<label title="Set the number of spaces that define a soft tab">Tab size</label>
 						</td>
 						<td>
-							<input id="tabsize" type="text" size="3" onclick="change_settings(this)">
+							<input id="tabsize" type="text" size="3" onchange="handle_settings(this)">
 						</td>
 					</tr>
 					<tr>
@@ -158,7 +161,7 @@
 							<label>Code Folding</label>
 						</td>
 						<td>
-							<select id="folding" onchange="change_settings(this)">
+							<select id="folding" onchange="handle_settings(this)">
 								<option value="manual">manual</option>
 								<option value="markbegin">mark begin</option>
 								<option value="markbeginend">mark begin and end</option>
@@ -170,7 +173,7 @@
 							<label>Keybindings</label>
 						</td>
 						<td>
-							<select id="keybinding" onchange="change_settings(this)">
+							<select id="keybinding" onchange="handle_settings(this)">
 								<option value="ace"><a>Ace</option>
 								<option value="vim"><a>Vim</option>
 								<option value="emacs"><a>Emacs</option>
@@ -183,7 +186,7 @@
 							<label>Syntax Highlight</label>
 						</td>
 						<td>
-							<select id="highlight" onchange="change_settings(this)">
+							<select id="mode" onchange="handle_settings(this)">
 								<option value="abap">abap</option>
 								<option value="asciidoc">asciidoc</option>
 								<option value="c9search">c9search</option>
@@ -250,7 +253,7 @@
 							<label>Theme</label>
 						</td>
 						<td>
-							<select id="theme" onchange="change_settings(this)">
+							<select id="theme" onchange="handle_settings(this)">
 								<option value="ambiance">ambiance</option>
 								<option value="chrome">chrome</option>
 								<option value="clouds">clouds</option>
@@ -286,13 +289,13 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="settings-table-td" align="right">
+			<td class="settings-table-td">
 				<table class="settings-menu ui-widget ui-widget-content ui-corner-all">
-					<tr><td><button id="undo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Undo</button></td></tr>
-					<tr><td><button id="redo" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Redo</button></td></tr>
-					<tr><td><button id="uppercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">UpperCase</button></td></tr>
-					<tr><td><button id="lowercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">LowerCase</button></td></tr>
-					<tr><td><button id="goto" class="ui-button ui-corner-all ui-button-text-icons" onclick="change_settings(this)">Goto...</button></td></tr>
+					<tr><td><button id="undo"      class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Undo</button></td></tr>
+					<tr><td><button id="redo"      class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Redo</button></td></tr>
+					<tr><td><button id="uppercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">UpperCase</button></td></tr>
+					<tr><td><button id="lowercase" class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">LowerCase</button></td></tr>
+					<tr><td><button id="goto"      class="ui-button ui-corner-all ui-button-text-icons" onclick="handle_actions(this)">Goto...</button></td></tr>
 				</table>
 			</td>
 		</tr>
@@ -300,7 +303,7 @@
 	</div>
 
 	<div id="tab2">
-		<table id="recently-opened" class="ui-widget ui-widget-content"></table>
+		<table id="recently-opened" class="ui-widget"></table>
 	</div>
     </div>
 </div>

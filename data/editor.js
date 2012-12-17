@@ -8,188 +8,6 @@
  */
 
 var editor;
-var newfile = false;
-
-const DEFAULT_FILENAME = 'Buffer';
-const STATUS_SAVED     = 'saved';
-const STATUS_CHANGED   = 'changed';
-
-var settings = {
-	_mode:       'text',
-	_keybinding: 'ace',
-	_theme:      'twilight',
-	_folding:    'manual',
-	_softwrap:   'off',
-	_fontsize:   '14px',
-	_tabSize:    4,
-
-	_showInvisibles:  true,
-	_showPrintMargin: true,
-	_showGutter:      true,
-	_softTab:         false,
-
-	init: function (editor) {
-		this._editor = editor;
-
-		settings.mode(this._mode);
-		settings.keybinding(this._keybinding);
-		settings.theme(this._theme);
-		settings.folding(this._folding);
-		settings.softwrap(this._softwrap);
-		settings.fontsize(this._fontsize);
-		settings.showInvisibles(this._showInvisibles);
-		settings.showGutter(this._showGutter);
-		settings.showPrintMargin(this._showPrintMargin);
-		settings.softTab(this._softTab);
-		settings.tabSize(this._tabSize);
-
-		$('#controlbar').on('click', function (e) {
-			$('#settings').toggleClass('hidden');
-		});
-	},
-	_update_select: function (id, arg) {
-		$(id + ' > option').each(function (k,v) {
-			if (v.value == arg) {
-				v.selected = 'selected';
-				return false;
-			}
-			return true;
-		});
-	},
-	_update_checkbox: function (id, arg) {
-		(arg)
-			? $(id).attr('checked', 'checked')
-			: $(id).removeAttr('checked');
-	},
-	showInvisibles: function (arg) {
-		if (arg === undefined)
-			return this._showInvisibles;
-		this._showInvisibles = arg;
-		this._editor.setShowInvisibles(this._showInvisibles);
-		this._update_checkbox('#showhidden', this._showInvisibles);
-	},
-	showGutter: function (arg) {
-		if (arg === undefined)
-			return this._showGutter;
-		this._showGutter = arg;
-		this._editor.renderer.setShowGutter(this._showGutter);
-		this._update_checkbox('#showgutter', this._showGutter);
-	},
-	showPrintMargin: function (arg) {
-		if (arg === undefined)
-			return this._showPrintMargin;
-		this._showPrintMargin = arg;
-		this._editor.renderer.setShowPrintMargin(this._showPrintMargin);
-		this._update_checkbox('#showmargin', this._showPrintMargin);
-	},
-	mode: function (arg) {
-		if (arg === undefined)
-			return this._mode;
-		this._editor.session.setMode('ace/mode/' + arg);
-		this._update_select('#highlight', arg);
-		this._mode = arg;
-	},
-	keybinding: function (arg) {
-		if (arg === undefined)
-			return this._keybinding;
-		this._editor.setDefaultHandler(arg);
-		this._keybinding = arg;
-	},
-	theme: function (arg) {
-		if (arg === undefined)
-			return this._theme;
-		this._editor.setTheme('ace/theme/' + arg);
-		this._update_select('#theme', arg);
-		this._theme = arg;
-	},
-	folding: function (arg) {
-		if (arg === undefined)
-			return this._folding;
-		this._editor.session.setFoldStyle(arg);
-		this._update_select('#folding', arg);
-		this._folding = arg;
-	},
-	softwrap: function (arg) {
-		if (arg === undefined)
-			return this._softwrap;
-		switch (arg) {
-			case "off":
-				this._editor.session.setUseWrapMode(false);
-				this._editor.renderer.setPrintMarginColumn(80);
-				break;
-			case "free":
-				this._editor.session.setUseWrapMode(true);
-				this._editor.session.setWrapLimitRange(null, null);
-				this._editor.renderer.setPrintMarginColumn(80);
-				break;
-			default:
-				this._editor.session.setUseWrapMode(true);
-				var col = parseInt(arg, 10);
-				this._editor.session.setWrapLimitRange(col, col);
-				this._editor.renderer.setPrintMarginColumn(col);
-		}
-		this._update_select('#softwrap', arg);
-		this._softwrap = arg;
-	},
-	fontsize: function (arg) {
-		if (arg === undefined)
-			return this._fontsize;
-		this._editor.setFontSize(arg);
-		this._update_select('#fontsize', arg);
-		this._fontsize = arg;
-	},
-	softTab: function (arg) {
-		if (arg === undefined)
-			return this._softTab;
-		this._softTab = arg;
-		this._editor.session.setUseSoftTabs(this._softTab);
-		this._update_checkbox('#softtab', this._softTab);
-	},
-	tabSize: function (arg) {
-		if (arg === undefined)
-			return this._tabSize;
-		var n = parseInt(arg);
-		this._editor.session.setTabSize(n);
-		$('#tabsize').val(n);
-		this._tabSize = n;
-	}
-};
-
-var statusbar = {
-	_filename:   DEFAULT_FILENAME,
-	_changed:    false,
-	_mode:       'text',
-
-	init: function () {
-		$('#statusbar-filename').text(this._filename);
-		$('#statusbar-changed').text(this._changed ? STATUS_CHANGED : STATUS_SAVED);
-		$('#statusbar-mode').text(this._mode);
-		$('#statusbar-keybinding').text(this._keybinding);
-	},
-	filename: function (name) {
-		if (name === undefined)
-			return this._filename;
-		if (name === '') {
-			this.changed(false);
-			this._filename = DEFAULT_FILENAME;
-		} else {
-			this._filename = name;
-		}
-		$('#statusbar-filename').text(this._filename);
-	},
-	changed: function (state) {
-		if (state === undefined)
-			return this._changed;
-		this._changed = state;
-		$('#statusbar-changed').text(state ? STATUS_CHANGED : STATUS_SAVED);
-	},
-	mode: function (mode) {
-		if (mode === undefined)
-			return this._mode;
-		this._mode = mode;
-		$('#statusbar-mode').text(mode);
-	}
-};
 
 var autosave = {
 	_id: 0,
@@ -197,10 +15,8 @@ var autosave = {
 		this._id = setInterval(function() {
 			var filename = $('#filedata').attr('name');
 			if (filename)
-				storage.backup(filename);
-		}, 3000);
-		if (this._id !== 0)
-			statusbar.changed(true);
+				backup_file(filename, true);
+		}, 5000);
 		return true;
 	},
 	stop: function() {
@@ -210,95 +26,68 @@ var autosave = {
 		} catch(e) {
 			alert(e);
 		}
-		statusbar.changed(false);
 		return false;
 	}
 };
 
-var storage = {
-	has: function (key) {
-		var items = localStorage.length;
+function onEditorChange(e) {
+	// e - Contains a single property, data, which has the delta of changes.
+	editorStatusbar.changed(true);
+	editor.removeListener('change', onEditorChange);
+}
 
-		for (var i = 0; i < items; i++) {
-			if (localStorage.key(i) == key)
-				return true;
-		}
-		return false;
-	},
-	backup: function (filename) {
-		try {
-			localStorage.setItem(filename, JSON.stringify({
-				name: filename,
-				mime: $('#filedata').attr('mime'),
-				data: editor.getValue()
-			}));
-
-		} catch (e) {
-			alert("Storage error: " + e);
-		}
-	},
-	restore: function (filename) {
-		try {
-			if (this.has(filename)) {
-				var file = JSON.parse(localStorage.getItem(filename));
-
-				editor.setValue(file.data);
-				editor.gotoLine(0,0,false);
-				editor.moveCursorTo(0,0);
-
-				var mode = guessMode.check(file.mime);
-				settings.mode(mode);
-
-				// Update statusbar
-				statusbar.filename(file.name);
-				statusbar.mode(mode);
-
-				$('#filedata').attr('name', file.name);
-				$('#filedata').attr('mime', file.mime);
-
-				autosave.start();
-				changed = true;
-				return true;
-			}
-		} catch (e) {
-			alert("Storage error: " + e);
-		}
-		return false;
-	},
-	remove: function (key) {
-		try {
-			localStorage.removeItem(key);
-		} catch (e) {
-			alert("Storage error: " + e);
-		}
-	},
-	get: function (key) {
-		try {
-			return (this.has(key))
-				? JSON.parse(localStorage.getItem(key))
-				: {};
-		} catch (e) {
-			alert("Storage error: " + e);
-		}
-		return {};
-	},
-	append: function (key, value, maxlen) {
-		try {
-			var list = (this.has(key))
-				? JSON.parse(localStorage.getItem(key))
-				: [];
-			if (maxlen !== undefined) {
-				if (list.length == maxlen)
-					list.pop();
-			}
-			list.unshift(value);
-			localStorage.setItem(key, JSON.stringify(list));
-			return list;
-		} catch (e) {
-			alert("Storage error: " + e);
-		}
+function backup_file(filename, storedata) {
+	try {
+		var prev = editorStorage.get(filename);
+		var date = ('date' in prev)
+			? prev.date
+			: ISODateString(new Date())
+		editorStorage.set('meta:' + filename, {
+			name: filename,
+			date: date,
+			mime: $('#filedata').attr('mime'),
+			mode: editorSettings.mode(),
+		});
+		if (storedata)
+			editorStorage.set('data:' + filename,
+				editor.getValue()
+			);
+	} catch (e) {
+		alert("Backup file error: " + e);
 	}
-};
+}
+
+function restore_file(filename) {
+	try {
+		if (this.has(filename)) {
+			var file = editorStorage.get('meta:' + filename);
+			var data = editorStorage.get('data:' + filename);
+
+			editor.removeListener('change', onEditorChange);
+			editor.setValue(data);
+			editor.gotoLine(0,0,false);
+			editor.moveCursorTo(0,0);
+			editor.on('change', onEditorChange);
+
+			// Restore human-selected mode
+			editorSettings.mode(file.mode);
+
+			// Update editorStatusbar
+			editorStatusbar.update({
+				filename: file.name,
+				mode:     file.mode,
+				changed:  true
+			});
+
+			$('#filedata').attr('name', file.name);
+			$('#filedata').attr('mime', file.mime);
+			return true;
+		}
+	} catch (e) {
+		alert("Restore file error: " + e);
+	}
+	return false;
+}
 
 function send_event(name, arg)
 {
@@ -323,14 +112,12 @@ function save_file()
 	try {
 		$('#filedata').val(editor.getSession().getValue());
 		send_event('send-save');
-		autosave.stop();
-		changed = false;
 	} catch(e) { /* Ignore all */ }
 }
 
 function open_file(name, mime)
 {
-	if (storage.has(name)) {
+	if (editorStorage.has(name)) {
 		dialog_restore_file(name, mime);
 		return;
 	}
@@ -339,6 +126,12 @@ function open_file(name, mime)
 		mime: mime,
 		name: name
 	});
+}
+
+function reopen(doc)
+{
+	var elem = $(doc);
+	open_file(elem.text(), elem.attr('mime'));
 }
 
 function dialog_new_file()
@@ -356,7 +149,7 @@ function dialog_new_file()
 				if (filename) {
 					$('#filedata').attr('name', filename);
 					save_file();
-					statusbar.filename(filename);
+					editorStatusbar.filename(filename);
 				}
 				$(this).dialog("close");
 			},
@@ -377,7 +170,7 @@ function dialog_save_file()
 		modal: true,
 		buttons: {
 			"Save": function() {
-				if (statusbar.changed()) {
+				if (editorStatusbar.changed()) {
 					save_file();
 				}
 				$(this).dialog("close");
@@ -389,6 +182,34 @@ function dialog_save_file()
 	});
 }
 
+function dialog_recently_opened(list)
+{
+	$('#recently-opened').empty();
+	$.each(list, function (i,n) {
+		var v = editorStorage.get('meta:' + n);
+		$('#recently-opened').append(
+			'<tr>'+
+			'<td class="recently-opened-name"><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
+			'<td class="recently-opened-date">' + v.date + '</td>'+
+			'<td class="recently-opened-act"><button class="recently-opened-remove-entry" arg="' + v.name + '"></button></td>'+
+			'</tr>');
+	});
+	$('.recently-opened-remove-entry').button({
+		icons: { primary: "ui-icon-close" },
+		text: false
+	}).on('click', function (e) {
+		var name = $(this).attr('arg');
+		var list = editorStorage.get('recently-opened');
+
+		editorStorage.set('recently-opened', list.filter(function (e, i, a) {
+			return (e != name);
+		}));
+
+		dialog_recently_opened(editorStorage.get('recently-opened'));
+	});
+}
+
+
 function dialog_restore_file(filename, mimetype)
 {
 	$('#dialog-restore-filename').text(filename);
@@ -399,13 +220,13 @@ function dialog_restore_file(filename, mimetype)
 		modal: true,
 		buttons: {
 			"Restore": function() {
-				if (storage.restore(filename)) {
-					statusbar.filename(filename);
+				if (restore_file(filename)) {
+					editorStatusbar.filename(filename);
 				}
 				$(this).dialog("close");
 			},
 			Cancel: function() {
-				storage.remove(filename);
+				editorStorage.remove('data:' + filename);
 				send_event('send-open', {
 					type: 'filedata',
 					mime: mimetype,
@@ -417,7 +238,7 @@ function dialog_restore_file(filename, mimetype)
 	});
 }
 
-function change_settings(obj)
+function handle_actions(obj)
 {
 	switch (obj.id) {
 		case 'open':
@@ -428,12 +249,18 @@ function change_settings(obj)
 			});
 			break;
 		case 'close':
-			newfile = true;
+			backup_file($('#filedata').attr('name'), true);
+
+			editorStatusbar.update({
+				filename: '',
+				changed: false
+			});
+
+			editor.removeListener('change', onEditorChange);
 			editor.setValue('');
 			editor.gotoLine(0,0,false);
+			editor.on('change', onEditorChange);
 			$('#filedata').attr('name', '');
-			statusbar.filename('');
-			newfile = false;
 			break;
 		case 'save':
 			dialog_save_file();
@@ -441,7 +268,6 @@ function change_settings(obj)
 		case 'save-as':
 			dialog_new_file();
 			break;
-
 		case 'undo':
 			editor.undo();
 			break;
@@ -460,145 +286,123 @@ function change_settings(obj)
 				editor.gotoLine(line);
 			}
 			break;
-
-		case 'theme':
-			settings.theme(obj.value);
-			statusbar.theme(obj.value);
-			break;
-		case 'highlight':
-			settings.mode(obj.value);
-			statusbar.mode(obj.value);
-			break;
-		case 'keybinding':
-			settings.keybinding(obj.value);
-			statusbar.keybinding(obj.value);
-			break;
-
-		case 'folding':
-			settings.folding(obj.value);
-			break;
-		case 'showhidden':
-			settings.showInvisibles(obj.checked);
-			break;
-		case 'showgutter':
-			settings.showGutter(obj.checked);
-			break;
-		case 'showmargin':
-			settings.showPrintMargin(obj.checked);
-			break;
-		case 'softwrap':
-			settings.softwrap(obj.value);
-			break;
-		case 'fontsize':
-			settings.fontsize(obj.value);
-			break;
-		case 'softtabs':
-			settings.softTab(obj.checked);
-		case 'tabsize':
-			settings.tabSize(obj.value);
 	}
 }
 
-function reopen(doc)
+function handle_settings(obj)
 {
-	var elem = $(doc);
-	open_file(elem.text(), elem.attr('mime'));
+	switch (obj.id) {
+		case 'theme':
+			editorSettings.theme(obj.value);
+			editorStatusbar.theme(obj.value);
+			break;
+		case 'mode':
+			editorSettings.mode(obj.value);
+			editorStatusbar.mode(obj.value);
+			break;
+		case 'keybinding':
+			editorSettings.keybinding(obj.value);
+			editorStatusbar.keybinding(obj.value);
+			break;
+		case 'folding':
+			editorSettings.folding(obj.value);
+			break;
+		case 'showhidden':
+			editorSettings.showInvisibles(obj.checked);
+			break;
+		case 'showgutter':
+			editorSettings.showGutter(obj.checked);
+			break;
+		case 'showmargin':
+			editorSettings.showPrintMargin(obj.checked);
+			break;
+		case 'softwrap':
+			editorSettings.softwrap(obj.value);
+			break;
+		case 'fontsize':
+			editorSettings.fontsize(obj.value);
+			break;
+		case 'softtabs':
+			editorSettings.softTab(obj.checked);
+			break;
+		case 'tabsize':
+			editorSettings.tabSize(obj.value);
+			break;
+		default:
+			return;
+	}
+	editorSettings.save();
 }
 
-function handleOpenFile(evt)
+function onOpenFile(evt)
 {
 	if (evt.detail.type == 'filename') {
 		open_file(evt.detail.name, evt.detail.mime);
 		return;
 	}
 
-	// Stop looking on previous file.
-	autosave.stop();
-	statusbar.changed(false);
+	var name = $('#filedata').attr('name');
+	var mime = $('#filedata').attr('mime');
+	var meta = editorStorage.get('meta:' + name);
+	var mode = ('mode' in meta) ? meta.mode : guessMode.check(mime);
+
+	// Update settings
+	editorSettings.mode(mode);
+
+	// Update statusbar
+	editorStatusbar.update({
+		filename: name,
+		mode:     mode,
+		changed:  false
+	});
 
 	// Set new file.
-	newfile = true;
+	editor.removeListener('change', onEditorChange);
 	editor.setValue($('#filedata').val());
 	editor.gotoLine(0,0,false);
 	editor.moveCursorTo(0,0);
-	newfile = false;
+	editor.on('change', onEditorChange);
 
-	var newmime = $('#filedata').attr('mime');
-	var newmode = guessMode.check(newmime);
-	settings.mode(newmode);
+	// Backup metadata
+	backup_file(name, false);
 
-	// Update statusbar
-	statusbar.filename($('#filedata').attr('name'));
-	statusbar.mode(newmode);
-try {
 	// Update history
-	var recently_opened = storage.get('recently-opened');
-	var found = false;
+	var recently_opened = editorStorage.get('recently-opened');
 
 	for (var i = 0; i < recently_opened.length; i++) {
-		if (recently_opened[i].name == $('#filedata').attr('name')) {
-			found = true;
-			break;
-		}
+		if (recently_opened[i] == name)
+			return;
 	}
 
-	if (!found) {
-		var d = new Date();
-		var list = storage.append('recently-opened', {
-			name: $('#filedata').attr('name'),
-			mime: $('#filedata').attr('mime'),
-			date: ISODateString(d)
-		}, 10);
-
-		$('#recently-opened').empty();
-		$.each(list, function (i,v) {
-			$('#recently-opened').append(
-				'<tr>'+
-				'<td><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
-				'<td>' + v.date + '</td>'+
-				'</tr>');
-		});
-	}
-} catch(e) { alert(e); }
+	var list = editorStorage.append('recently-opened', name, 30);
+	dialog_recently_opened(list);
 }
+
 
 function main()
 {
 	$("#tabs").tabs({ heightStyle: "fill" });
 
-	$.each(storage.get('recently-opened'), function (i,v) {
-		$('#recently-opened').append(
-			'<tr>'+
-			'<td><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
-			'<td>' + v.date + '</td>'+
-			'</tr>');
+	$('#controlbar').on('click', function (e) {
+		$('#settings').toggleClass('hidden');
 	});
 
-	/*
-	 * Create editor
-	 */
-	window.__editor__ = editor = ace.edit('editor');
+	dialog_recently_opened(editorStorage.get('recently-opened'));
+
+	// Create editor
+	editor = ace.edit('editor');
 	editor.resize();
 
-	/*
-	 * Setup helpers
-	 */
-	statusbar.init();
-	settings.init(editor);
+	// Setup helpers
+	editorStatusbar.init();
+	editorSettings.init(editor);
 
-	/*
-	 * Set addon handler
-	 */
-	$('#filedata').get(0).addEventListener('recv-open', handleOpenFile);
+	// Start watchdog
+	 autosave.start();
 
-	/*
-	 * Autosave block
-	 */
-	editor.on('change', function(e) {
-		// e - Contains a single property, data, which has the delta of changes.
-		if (statusbar.changed() || newfile)
-			return;
-		autosave.start();
-		statusbar.changed(true);
-	});
+	// Track changes
+	editor.on('change', onEditorChange);
+
+	// Set addon handler
+	$('#filedata').get(0).addEventListener('recv-open', onOpenFile);
 }
