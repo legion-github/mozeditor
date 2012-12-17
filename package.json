@@ -1,8 +1,8 @@
 {
-    "id": "mozeditor@mozilla-russia.org",
+    "id": "editor@mozilla-russia.org",
     "version": "0.1",
-    "name": "mozeditor",
-    "fullName": "mozilla editor",
+    "name": "editor",
+    "fullName": "browser editor",
     "description": "Editor (ACE) embedded in mozilla browser. This plugin doesn't use a network or network services for editing. Everything happens on the local machine.",
     "author": "Alexey Gladkov",
     "license": "GPL 2.0",
