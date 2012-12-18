@@ -204,9 +204,9 @@ function dialog_recently_opened(list)
 	$.each(list, function (i,n) {
 		var v = editorStorage.get('meta:' + n);
 		$('#recently-opened').append(
-			'<tr>'+
-			'<td class="recently-opened-name"><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
-			'<td class="recently-opened-date">' + v.date + '</td>'+
+			'<tr class="ui-widget">'+
+			'<td class="recently-opened-name ui-widget-content ui-corner-all"><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
+			'<td class="recently-opened-date ui-widget-content ui-corner-all">' + v.date + '</td>'+
 			'<td class="recently-opened-act"><button class="recently-opened-remove-entry" arg="' + v.name + '"></button></td>'+
 			'</tr>');
 	});

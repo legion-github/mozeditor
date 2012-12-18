@@ -69,7 +69,7 @@
 					list.pop();
 			}
 			list.unshift(value);
-			editorStorage.sett(key, list);
+			editorStorage.set(key, list);
 			return list;
 		} catch (e) {
 			editorNotify.error({
