@@ -22,7 +22,11 @@
 		try {
 			localStorage.removeItem(key);
 		} catch (e) {
-			alert("editorStorage error: " + e);
+			editorNotify.error({
+				title: "editorStorage error",
+				text: e
+			});
+			throw "Unable to remove value";
 		}
 	};
 
@@ -35,7 +39,11 @@
 				? JSON.parse(localStorage.getItem(key))
 				: dv;
 		} catch (e) {
-			alert("editorStorage error: " + e);
+			editorNotify.error({
+				title: "editorStorage error",
+				text: e
+			});
+			throw "Unable to obtain value";
 		}
 		return dv;
 	};
@@ -45,7 +53,11 @@
 			localStorage.setItem(key, JSON.stringify(value));
 
 		} catch (e) {
-			alert("editorStorage error: " + e);
+			editorNotify.error({
+				title: "editorStorage error",
+				text: e
+			});
+			throw "Unable to save value";
 		}
 	};
 
@@ -57,11 +69,15 @@
 					list.pop();
 			}
 			list.unshift(value);
-			editorStorage.set(key, list);
+			editorStorage.sett(key, list);
 			return list;
 		} catch (e) {
-			alert("editorStorage error: " + e);
+			editorNotify.error({
+				title: "editorStorage error",
+				text: e
+			});
+			throw "Unable to append value";
 		}
 	};
 
-}(window.editorStorage = window.editorStorage || {}));
+} (window.editorStorage = window.editorStorage || {}));

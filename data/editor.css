@@ -59,6 +59,8 @@ a:hover, a:active, a:focus {
 
 	font-size: 1em;
 	padding: 5px 10px 5px 10px;*/
+
+	z-index: 0;
 }
 
 .statusbar-value {
@@ -72,7 +74,7 @@ a:hover, a:active, a:focus {
 	padding:10px; 
 	background: #dddddd;
 	opacity: 0.4;
-	z-index: 100;
+	z-index: 90;
 
 	width: 80px;
 	height: 80px;
@@ -117,6 +119,11 @@ a:hover, a:active, a:focus {
 
 .ui-widget-overlay {
 	background: rgba(0, 0, 0, 0.6);
+}
+
+.ui-notify-message {
+	position: relative;
+	z-index: 100;
 }
 
 #recently-opened {

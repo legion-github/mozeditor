@@ -24,7 +24,10 @@ var autosave = {
 			if (this._id !== 0)
 				clearInterval(this._id);
 		} catch(e) {
-			alert(e);
+			editorNotify.error({
+				title:'Autosave error',
+				text: e
+			});
 		}
 		return false;
 	}
@@ -53,7 +56,10 @@ function backup_file(filename, storedata) {
 				editor.getValue()
 			);
 	} catch (e) {
-		alert("Backup file error: " + e);
+		editorNotify.error({
+			title:'Error in backuping file',
+			text: e
+		});
 	}
 }
 
@@ -84,17 +90,27 @@ function restore_file(filename) {
 			return true;
 		}
 	} catch (e) {
-		alert("Restore file error: " + e);
+		editorNotify.error({
+			title:'Error in restoring file',
+			text: e
+		});
 	}
 	return false;
 }
 
 function send_event(name, arg)
 {
-	var event = new CustomEvent(name, {
-		"detail": (arg !== undefined) ? arg : ''
-	});
-	$('#filedata').get(0).dispatchEvent(event);
+	try {
+		var event = new CustomEvent(name, {
+			"detail": (arg !== undefined) ? arg : ''
+		});
+		$('#filedata').get(0).dispatchEvent(event);
+	} catch(e) {
+		editorNotify.error({
+			title:'Event error',
+			text: e
+		});
+	}
 }
 
 function ISODateString(d){
@@ -286,6 +302,12 @@ function handle_actions(obj)
 				editor.gotoLine(line);
 			}
 			break;
+		default:
+			editorNotify.info({
+				title:'Unknown action',
+				text: 'The requested action is not known'
+			});
+			return;
 	}
 }
 
@@ -329,6 +351,10 @@ function handle_settings(obj)
 			editorSettings.tabSize(obj.value);
 			break;
 		default:
+			editorNotify.info({
+				title:'Unknown operation',
+				text: 'The requested operation is not known'
+			});
 			return;
 	}
 	editorSettings.save();
@@ -336,51 +362,61 @@ function handle_settings(obj)
 
 function onOpenFile(evt)
 {
-	if (evt.detail.type == 'filename') {
-		open_file(evt.detail.name, evt.detail.mime);
-		return;
-	}
-
-	var name = $('#filedata').attr('name');
-	var mime = $('#filedata').attr('mime');
-	var meta = editorStorage.get('meta:' + name);
-	var mode = ('mode' in meta) ? meta.mode : guessMode.check(mime);
-
-	// Update settings
-	editorSettings.mode(mode);
-
-	// Update statusbar
-	editorStatusbar.update({
-		filename: name,
-		mode:     mode,
-		changed:  false
-	});
-
-	// Set new file.
-	editor.removeListener('change', onEditorChange);
-	editor.setValue($('#filedata').val());
-	editor.gotoLine(0,0,false);
-	editor.moveCursorTo(0,0);
-	editor.on('change', onEditorChange);
-
-	// Backup metadata
-	backup_file(name, false);
-
-	// Update history
-	var recently_opened = editorStorage.get('recently-opened');
-
-	for (var i = 0; i < recently_opened.length; i++) {
-		if (recently_opened[i] == name)
+	try {
+		if (evt.detail.type == 'filename') {
+			open_file(evt.detail.name, evt.detail.mime);
 			return;
-	}
+		}
 
-	var list = editorStorage.append('recently-opened', name, 30);
-	dialog_recently_opened(list);
+		var name = $('#filedata').attr('name');
+		var mime = $('#filedata').attr('mime');
+		var meta = editorStorage.get('meta:' + name);
+		var mode = ('mode' in meta) ? meta.mode : guessMode.check(mime);
+
+		// Update settings
+		editorSettings.mode(mode);
+
+		// Update statusbar
+		editorStatusbar.update({
+			filename: name,
+			mode:     mode,
+			changed:  false
+		});
+
+		// Set new file.
+		editor.removeListener('change', onEditorChange);
+		editor.setValue($('#filedata').val());
+		editor.gotoLine(0,0,false);
+		editor.moveCursorTo(0,0);
+		editor.on('change', onEditorChange);
+
+		// Backup metadata
+		backup_file(name, false);
+
+		// Update history
+		var recently_opened = editorStorage.get('recently-opened');
+
+		for (var i = 0; i < recently_opened.length; i++) {
+			if (recently_opened[i] == name)
+				return;
+		}
+
+		var list = editorStorage.append('recently-opened', name, 30);
+		dialog_recently_opened(list);
+
+	} catch(e) {
+		editorNotify.error({
+			title:'Error in opening file',
+			text: e
+		});
+	}
 }
 
 
 function main()
 {
+	editorNotify.init("#notifications");
+
 	$("#tabs").tabs({ heightStyle: "fill" });
 
 	$('#controlbar').on('click', function (e) {

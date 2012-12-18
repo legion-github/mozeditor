@@ -18,15 +18,18 @@
 	<title>Editor</title>
 
 	<link type="text/css" rel="stylesheet" href="jquery-ui-1.9.2.custom.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="jquery-ui.notify.css" media="screen" />
 	<link type="text/css" rel="stylesheet" href="editor.css" media="screen" />
 
 	<script src="jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="jquery-ui-1.9.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery.notify.js" type="text/javascript" charset="utf-8"></script>
 
 	<script src="src/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="src/keybinding-emacs.js" type="text/javascript" charset="utf-8"></script>
 	<script src="src/keybinding-vim.js" type="text/javascript" charset="utf-8"></script>
 
+	<script src="editor-notify.js" type="text/javascript" charset="utf-8"></script>
 	<script src="editor-guessmode.js" type="text/javascript" charset="utf-8"></script>
 	<script src="editor-storage.js" type="text/javascript" charset="utf-8"></script>
 	<script src="editor-settings.js" type="text/javascript" charset="utf-8"></script>
@@ -34,6 +37,26 @@
 	<script src="editor.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body onload="main()">
+
+<div id="notifications" style="display:none">
+	<div id="sticky-message" class="ui-widget-content">
+		<span class="ui-icon ui-icon-circle-close ui-notify-close" style="float: right; margin: 0 7px 20px 0;"></span>
+		<h1>#{title}</h1>
+		<p>#{text}</p>
+	</div>
+	<div id="sticky-info" class="ui-widget-content">
+		<span class="ui-icon ui-icon-circle-close ui-notify-close" style="float: right; margin: 0 7px 20px 0;"></span>
+		<span class="ui-state-highlight" style="border:0;"><span class="ui-icon ui-icon-info" style="float:left;"></span></span>
+		<h1>#{title}</h1>
+		<p>#{text}</p>
+	</div>
+	<div id="sticky-error" class="ui-widget-content">
+		<span class="ui-icon ui-icon-circle-close ui-notify-close" style="float: right; margin: 0 7px 20px 0;"></span>
+		<span class="ui-state-error" style="border:0;"><span class="ui-icon ui-icon-alert" style="float:left;"></span></span>
+		<h1>#{title}</h1>
+		<p>#{text}</p>
+	</div>
+</div>
 
 <div class="hidden">
 	<textarea id="filedata" class="hidden"></textarea>
