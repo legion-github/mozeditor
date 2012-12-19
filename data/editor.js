@@ -417,7 +417,21 @@ function main()
 {
 	editorNotify.init("#notifications");
 
-	$("#tabs").tabs({ heightStyle: "fill" });
+	$("#tabs").tabs({
+		heightStyle: "fill",
+		activate: function (e,ui) {
+			if (ui.newTab.attr('aria-controls') == "tab-recently-opened") {
+				if (ui.newTab.attr('editorWatchDog'))
+					return;
+				ui.newTab.attr('editorWatchDog',
+					setInterval(function() {
+						dialog_recently_opened(editorStorage.get('recently-opened'));
+					}, 10000));
+			} else {
+				clearInterval(ui.newTab.attr('editorWatchDog'));
+			}
+		}
+	});
 
 	$('#controlbar').on('click', function (e) {
 		$('#settings').toggleClass('hidden');
