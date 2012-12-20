@@ -13,9 +13,9 @@ var autosave = {
 	_id: 0,
 	start: function() {
 		this._id = setInterval(function() {
-			var filename = $('#filedata').attr('name');
-			if (filename)
-				backup_file(filename, true);
+			var path = $('#filedata').attr('path');
+			if (path)
+				backup_file(path, true);
 		}, 5000);
 		return true;
 	},
@@ -39,20 +39,21 @@ function onEditorChange(e) {
 	editor.removeListener('change', onEditorChange);
 }
 
-function backup_file(filename, storedata) {
+function backup_file(path, storedata) {
 	try {
-		var prev = editorStorage.get(filename);
+		var prev = editorStorage.get(path);
 		var date = ('date' in prev)
 			? prev.date
 			: ISODateString(new Date())
-		editorStorage.set('meta:' + filename, {
-			name: filename,
+		editorStorage.set('meta:' + path, {
+			path: path,
 			date: date,
+			name: $('#filedata').attr('name'),
 			mime: $('#filedata').attr('mime'),
 			mode: editorSettings.mode(),
 		});
 		if (storedata)
-			editorStorage.set('data:' + filename,
+			editorStorage.set('data:' + path,
 				editor.getValue()
 			);
 	} catch (e) {
@@ -63,12 +64,12 @@ function backup_file(filename, storedata) {
 	}
 }
 
-function restore_file(filename) {
+function restore_file(path) {
 	try {
-		if (this.has(filename)) {
-			var file = editorStorage.get('meta:' + filename);
-			var data = editorStorage.get('data:' + filename);
+		var file = editorStorage.get('meta:' + path);
+		var data = editorStorage.get('data:' + path);
 
+		if (file && data) {
 			editor.removeListener('change', onEditorChange);
 			editor.setValue(data);
 			editor.gotoLine(0,0,false);
@@ -80,12 +81,13 @@ function restore_file(filename) {
 
 			// Update editorStatusbar
 			editorStatusbar.update({
-				filename: file.name,
+				filename: file.path,
 				mode:     file.mode,
 				changed:  true
 			});
 
 			$('#filedata').attr('name', file.name);
+			$('#filedata').attr('path', file.path);
 			$('#filedata').attr('mime', file.mime);
 			return true;
 		}
@@ -131,28 +133,30 @@ function save_file()
 	} catch(e) { /* Ignore all */ }
 }
 
-function open_file(name, mime)
+function open_file(file)
 {
-	if (editorStorage.has(name)) {
-		dialog_restore_file(name, mime);
+	if (editorStorage.has('data:' + file.path)) {
+		dialog_restore_file(file.path, file.mime);
 		return;
 	}
 	send_event('send-open', {
 		type: 'filedata',
-		mime: mime,
-		name: name
+		mime: file.mime,
+		name: file.name,
+		path: file.path
 	});
 }
 
 function reopen(doc)
 {
 	var elem = $(doc);
-	open_file(elem.text(), elem.attr('mime'));
+	var v = editorStorage.get('meta:' + elem.text());
+	open_file(v);
 }
 
 function dialog_new_file()
 {
-	$('#dialog-new-filename').val($('#filedata').attr('name'));
+	$('#dialog-new-filename').val($('#filedata').attr('path'));
 	$('#dialog-new-file').dialog({
 		autoOpen: true,
 		resizable: true,
@@ -160,12 +164,12 @@ function dialog_new_file()
 		modal: true,
 		buttons: {
 			"Save": function() {
-				var filename = $('#dialog-new-filename').val();
+				var path = $('#dialog-new-filename').val();
 
-				if (filename) {
-					$('#filedata').attr('name', filename);
+				if (path) {
+					$('#filedata').attr('path', path);
 					save_file();
-					editorStatusbar.filename(filename);
+					editorStatusbar.filename(path);
 				}
 				$(this).dialog("close");
 			},
@@ -178,7 +182,7 @@ function dialog_new_file()
 
 function dialog_save_file()
 {
-	$('#dialog-save-filename').text($('#filedata').attr('name'));
+	$('#dialog-save-filename').text($('#filedata').attr('path'));
 	$("#dialog-save-file").dialog({
 		autoOpen: true,
 		resizable: true,
@@ -205,9 +209,9 @@ function dialog_recently_opened(list)
 		var v = editorStorage.get('meta:' + n);
 		$('#recently-opened').append(
 			'<tr class="ui-widget">'+
-			'<td class="recently-opened-name ui-widget-content ui-corner-all"><a class="ui-button" mime="'+ v.mime +'" onclick="reopen(this)">'+ v.name +'</a></td>'+
+			'<td class="recently-opened-name ui-widget-content ui-corner-all"><a class="ui-button" onclick="reopen(this)">'+ v.path +'</a></td>'+
 			'<td class="recently-opened-date ui-widget-content ui-corner-all">' + v.date + '</td>'+
-			'<td class="recently-opened-act"><button class="recently-opened-remove-entry" arg="' + v.name + '"></button></td>'+
+			'<td class="recently-opened-act"><button class="recently-opened-remove-entry" arg="' + v.path + '"></button></td>'+
 			'</tr>');
 	});
 	$('.recently-opened-remove-entry').button({
@@ -242,12 +246,10 @@ function dialog_restore_file(filename, mimetype)
 				$(this).dialog("close");
 			},
 			Cancel: function() {
+				var v = editorStorage.get('meta:' + filename);
 				editorStorage.remove('data:' + filename);
-				send_event('send-open', {
-					type: 'filedata',
-					mime: mimetype,
-					name: filename
-				});
+				v.type = 'filedata';
+				send_event('send-open', v);
 				$(this).dialog("close");
 			}
 		}
@@ -265,7 +267,8 @@ function handle_actions(obj)
 			});
 			break;
 		case 'close':
-			backup_file($('#filedata').attr('name'), true);
+
+			backup_file($('#filedata').attr('path'), true);
 
 			editorStatusbar.update({
 				filename: '',
@@ -277,6 +280,9 @@ function handle_actions(obj)
 			editor.gotoLine(0,0,false);
 			editor.on('change', onEditorChange);
 			$('#filedata').attr('name', '');
+			$('#filedata').attr('path', '');
+
+			window.document.title = 'Editor';
 			break;
 		case 'save':
 			dialog_save_file();
@@ -364,13 +370,14 @@ function onOpenFile(evt)
 {
 	try {
 		if (evt.detail.type == 'filename') {
-			open_file(evt.detail.name, evt.detail.mime);
+			open_file(evt.detail);
 			return;
 		}
 
-		var name = $('#filedata').attr('name');
-		var mime = $('#filedata').attr('mime');
-		var meta = editorStorage.get('meta:' + name);
+		var name = evt.detail.name;
+		var path = evt.detail.path;
+		var mime = evt.detail.mime;
+		var meta = editorStorage.get('meta:' + path);
 		var mode = ('mode' in meta) ? meta.mode : guessMode.check(mime);
 
 		// Update settings
@@ -378,7 +385,7 @@ function onOpenFile(evt)
 
 		// Update statusbar
 		editorStatusbar.update({
-			filename: name,
+			filename: path,
 			mode:     mode,
 			changed:  false
 		});
@@ -390,18 +397,21 @@ function onOpenFile(evt)
 		editor.moveCursorTo(0,0);
 		editor.on('change', onEditorChange);
 
+		// Update title
+		window.document.title = 'Editor: ' + name;
+
 		// Backup metadata
-		backup_file(name, false);
+		backup_file(path, false);
 
 		// Update history
 		var recently_opened = editorStorage.get('recently-opened');
 
 		for (var i = 0; i < recently_opened.length; i++) {
-			if (recently_opened[i] == name)
+			if (recently_opened[i] == path)
 				return;
 		}
 
-		var list = editorStorage.append('recently-opened', name, 30);
+		var list = editorStorage.append('recently-opened', path, 30);
 		dialog_recently_opened(list);
 
 	} catch(e) {

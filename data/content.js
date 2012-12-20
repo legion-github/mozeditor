@@ -21,6 +21,7 @@ $('#filedata').get(0).addEventListener('send-save',
 		self.port.emit('send-save', JSON.stringify({
 			type: 'filedata',
 			name: $('#filedata').attr('name'),
+			path: $('#filedata').attr('path'),
 			mime: $('#filedata').attr('mime'),
 			data: $('#filedata').val()
 		}));
@@ -29,12 +30,7 @@ $('#filedata').get(0).addEventListener('send-save',
 
 $('#filedata').get(0).addEventListener('send-open',
 	function (evt) {
-		self.port.emit('send-open', JSON.stringify({
-			type: evt.detail.type,
-			name: evt.detail.name,
-			mime: evt.detail.mime,
-			data: ''
-		}));
+		self.port.emit('send-open', JSON.stringify(evt.detail));
 	}
 );
 
@@ -44,25 +40,16 @@ self.port.on('recv-open',
 			var file = JSON.parse(message);
 
 			if (file.type == 'filename') {
-				event('recv-open', {
-					type: 'filename',
-					name: file.name,
-					mime: file.mime,
-					data: ''
-				});
+				event('recv-open', file);
 				return;
 			}
 
 			$('#filedata').val(file.data);
 			$('#filedata').attr('name', file.name);
+			$('#filedata').attr('path', file.path);
 			$('#filedata').attr('mime', file.mime);
 
-			event('recv-open', {
-				type: 'filedata',
-				name: file.name,
-				mime: file.mime,
-				data: ''
-			});
+			event('recv-open', file);
 		} catch(e) {
 			alert(e);
 		}
