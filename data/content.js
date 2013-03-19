@@ -55,3 +55,15 @@ self.port.on('recv-open',
 		}
 	}
 );
+
+self.port.on('recv-save',
+	function (message) {
+		try {
+			var ans = JSON.parse(message);
+			event('recv-save', ans);
+		} catch(e) {
+			alert('connect.js: ' + e);
+		}
+	}
+);
+

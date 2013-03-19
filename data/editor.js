@@ -417,11 +417,30 @@ function onOpenFile(evt)
 	} catch(e) {
 		editorNotify.error({
 			title:'Error in opening file',
-			text: e
+			text: e.toString()
 		});
 	}
 }
 
+function onSaveFile(evt)
+{
+	try {
+		if (evt.detail.status == 'ok') {
+			editorStatusbar.changed(false);
+			return;
+		}
+
+		editorNotify.error({
+			title:'Error in saving file',
+			text: evt.detail.message
+		});
+	} catch(e) {
+		editorNotify.error({
+			title:'Error in saving file',
+			text: e.toString()
+		});
+	}
+}
 
 function main()
 {
@@ -465,4 +484,5 @@ function main()
 
 	// Set addon handler
 	$('#filedata').get(0).addEventListener('recv-open', onOpenFile);
+	$('#filedata').get(0).addEventListener('recv-save', onSaveFile);
 }
