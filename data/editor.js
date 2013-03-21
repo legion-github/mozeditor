@@ -485,4 +485,6 @@ function main()
 	// Set addon handler
 	$('#filedata').get(0).addEventListener('recv-open', onOpenFile);
 	$('#filedata').get(0).addEventListener('recv-save', onSaveFile);
+
+	send_event('send-ready');
 }

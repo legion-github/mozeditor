@@ -34,6 +34,12 @@ $('#filedata').get(0).addEventListener('send-open',
 	}
 );
 
+$('#filedata').get(0).addEventListener('send-ready',
+	function (evt) {
+		self.port.emit('send-ready', '');
+	}
+);
+
 self.port.on('recv-open',
 	function (message) {
 		try {
